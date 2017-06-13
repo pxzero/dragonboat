@@ -1,0 +1,35 @@
+.page5 {
+  .title {
+    width: 80%;
+    margin-top: 10%;
+  }
+  .info {
+    width: 100%;
+    top: -5%;
+    margin-top: 5%;
+    transform: scale(0);
+    transition: all 0.3s ease;
+    &.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  .btn-area {
+    text-align: center;
+    bottom: 20px;
+  }
+  .btn-area a {
+    $zoom: 0.6;
+    display: inline-block;
+    background: url(../images/page5-btn.png) 0 0 no-repeat;
+    background-size: 483px*$zoom 52px*$zoom;
+    width: 486px*$zoom/2;
+    height: 55px*$zoom;
+    &.share {
+      background-position-x: -483px/2*$zoom;
+    }
+  }
+  .slideup {
+    transition-delay: 0.3s;
+  }
+}
