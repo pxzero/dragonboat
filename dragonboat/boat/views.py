@@ -12,7 +12,7 @@ from boat.common.BoatResponse import BoatResponse
 
 import json
 
-from boat.models import Boat, BoatFollower
+from boat.models import Boat, BoatFollower, BoatUserHis
 
 
 def index(request):
@@ -26,8 +26,8 @@ def become_caption(request):
             boat = Boat()
             boat.boat_topic = jdata["boat_topic"]
             boat.boat_owner = jdata["boat_owner"]
-            tz = pytz.timezone("Asia/Shanghai")
-            boat.boat_create_time = datetime.datetime.fromtimestamp(jdata["boat_create_time"], tz)
+            boat.boat_create_time = datetime.datetime.fromtimestamp(jdata["boat_create_time"],
+                                                                    pytz.timezone("Asia/Shanghai"))
             boat.boat_distance = 0
             boat.save()
             return BoatResponse.resp(200, "success")
@@ -39,7 +39,13 @@ def become_caption(request):
 
 
 def search_boat(request):
-    pass
+    if request.method == "POST":
+        try:
+            pass
+        except Exception as e:
+            print(e)
+    else:
+        return BoatResponse.resp(405, "fail")
 
 
 def become_follower(request):
@@ -90,8 +96,21 @@ def __save_follower(jdata):
 
 
 def __save_follower_history(fdata):
-    pass
+    his = BoatUserHis()
+    if isinstance(fdata, Boat):
+        his.boat_id = fdata.boat_id
+        his.openid = fdata.user_id
+        his.ac_time = datetime.datetime.fromtimestamp(datetime.now,pytz.timezone("Asia/Shanghai"))
+        his.ac_ctx = fdata.str()
+        his.save()
 
 
 def __save_caption_history(cdata):
-    pass
+    his = BoatUserHis()
+    if isinstance(cdata,Boat):
+        his.boat_id = cdata.boat_id
+        his.openid = cdata.open_id
+        his.ac_time = datetime.datetime.fromtimestamp(datetime.now,pytz.timezone("Asia/Shanghai"))
+        his.ac_ctx = cdata.str()
+        his.save()
+
