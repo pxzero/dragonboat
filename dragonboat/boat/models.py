@@ -10,6 +10,7 @@ class Boat(models.Model):
     boat_id = models.AutoField(primary_key=True, auto_created=True)
     boat_topic = models.CharField(max_length=255)
     boat_owner = models.CharField(max_length=255)
+    boat_owner_nick_name = models.CharField(max_length=255,default="")
     boat_create_time = models.DateTimeField()
     boat_destory_time = models.DateTimeField(auto_now=False, null=True)
     boat_distance = models.BigIntegerField()

@@ -26,6 +26,7 @@ def become_caption(request):
             boat = Boat()
             boat.boat_topic = jdata["boat_topic"]
             boat.boat_owner = jdata["boat_owner"]
+            boat.boat_owner_nick_name = jdata["boat_owner_nick_name"]
             boat.boat_create_time = datetime.datetime.fromtimestamp(jdata["boat_create_time"],
                                                                     pytz.timezone("Asia/Shanghai"))
             boat.boat_distance = 0
@@ -41,9 +42,23 @@ def become_caption(request):
 def search_boat(request):
     if request.method == "POST":
         try:
-            pass
+            jdata = json.loads(request.body)
+            boat_id = jdata["boat_id"]
+            open_id = jdata["open_id"]
+            boat_data = Boat.objects.filter(boat_id=boat_id).get()
+            top_data = __get_top_data(boat_data)
+            user_data = __get_user_data(open_id)
+            ret_data = {
+                "boat_topic": boat_data.boat_topic,
+                "boat_owner_nick_name": boat_data.boat_owner_nick_name,
+                "boat_create_time": boat_data.boat_create_time,
+                "top_data": top_data,
+                "user_data": user_data
+            }
+            BoatResponse.resp(200, "", ret_data)
         except Exception as e:
             print(e)
+            return BoatResponse.resp(500, "server internal error")
     else:
         return BoatResponse.resp(405, "fail")
 
@@ -113,4 +128,15 @@ def __save_caption_history(cdata):
         his.ac_time = datetime.datetime.fromtimestamp(datetime.now,pytz.timezone("Asia/Shanghai"))
         his.ac_ctx = cdata.str()
         his.save()
+
+
+def __get_top_data(boat_data):
+    return {}
+    pass
+
+
+def __get_user_data(open_id):
+    boat_follower = BoatFollower.objects.filter(user_id=open_id).get()
+    pass
+
 
