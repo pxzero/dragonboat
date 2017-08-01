@@ -48,12 +48,14 @@ def search_boat(request):
             boat_data = Boat.objects.filter(boat_id=boat_id).get()
             top_data = __get_top_data(boat_data)
             user_data = __get_user_data(open_id)
+            follower_data = __get_follower_data(boat_data)
             ret_data = {
                 "boat_topic": boat_data.boat_topic,
                 "boat_owner_nick_name": boat_data.boat_owner_nick_name,
                 "boat_create_time": boat_data.boat_create_time,
                 "top_data": top_data,
-                "user_data": user_data
+                "user_data": user_data,
+                "follower_data": follower_data
             }
             BoatResponse.resp(200, "", ret_data)
         except Exception as e:
@@ -131,12 +133,35 @@ def __save_caption_history(cdata):
 
 
 def __get_top_data(boat_data):
+    # get from memcache
     return {}
-    pass
 
 
 def __get_user_data(open_id):
-    boat_follower = BoatFollower.objects.filter(user_id=open_id).get()
-    pass
+    resp = {}
+    boat = Boat.objects.filter(boat_owner=open_id).first()
+    boat_follower = BoatFollower.objects.filter(user_id=open_id).first()
+    if boat:
+        resp["user_boat_id"] = boat.boat_id
+        resp["user_role"] = BoatUserStatus.CAPTION
+    else:
+        resp["user_boat_id"] = ""
+        if boat_follower:
+            resp["user_role"] = BoatUserStatus.FOLLOWER
+        else:
+            resp["user_role"] = BoatUserStatus.FRESHER
+    return resp
 
 
+def __get_follower_data(boat_data):
+    resp = {}
+    boat_followers = BoatFollower.objects.filter(user_id=boat_data.user_id).all()
+    resp["size"] = len(boat_followers)
+    data = []
+    for boat_follower in boat_followers:
+        data += {
+            "user_id":boat_follower.user_id,
+            "nick_name":boat_follower.nick_name
+        }
+    resp["data"] = data
+    return resp
